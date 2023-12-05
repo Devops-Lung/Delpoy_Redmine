@@ -104,7 +104,30 @@ Mặc định, Terraform sẽ thực thi cùng lúc 10 thao tác dựa vào plan
 
 
 
-### 1.4 Amazone Cloud- AWS
+### 1.4 Amazone EC2
+
+Amazon EC2 Instanc là một cloud server. Với một tài khoản bạn có thể tạo và sử dụng nhiều Amazon EC2 Instance. Các Amazon EC2 Instance được chạy trên cùng một server vật lý và chia sẻ memory, CPU, ổ cứng...
+
+Tuy nhiên do tính chất của cloud service nên mỗi một Instance được hoạt động giống như một server riêng lẻ.
+
+#### Các đặc tính của Amazon EC2
+##### 1. Scaling:
+Scaling Up/Down: Tăng/Giảm capacity(RAM, CPU,...) của Instance.
+
+Scaling In/Out: Tăng/Giảm số lượng Instance.
+##### 2. Security:
+Có thể thiết lập rank IP Private dành riêng cho EC2.
+
+Sử dụng Security Group và Network ACLS để control inbound/outbound.
+
+Có thể thiết lập IPsec VPN giữa Data Center và AWS Clound.
+
+Delicated Instance -> Tạo EC2 trên 1 hardware physical dành riêng cho 1 khách hàng duy nhất.
+##### 3. Cost:
+On-Demand Instance: Tính theo giờ, đáp ứng nhu cầu dùng trong thời gian ngắn. Dùng bao nhiêu, trả bấy nhiêu.
+
+Reserved Instance: Cho phép trả trước 1 lượng Server cho 1 hoặc 3 năm. Chi phí chỉ bằng 75% so với On-Demand. Nêú không có nhu cầu sử dụng trong thời gian dài, bạn có thể sale tại Reserved Instance Marketplace
+
 
 ### 1.5 Docker Hub
 Dùng để tạo registry lưu trữ đóng gói các container do chúng ta tạo nên. Đơn cử như nội dung báo cáo lần này.
