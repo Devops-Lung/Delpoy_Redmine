@@ -29,16 +29,83 @@ Restore bằng cách pull image trên docker hub về để kiểm tra tính to�
 
 ## Phần I. Giới Thiệu Về Các Tài Nguyên
 ### 1.1 Docker
+#### 1.1.1 Định nghĩa
+Docker là một nền tảng mở cho phát triển, vận chuyển và chạy ứng dụng.
+Docker cho phép bạn tách các ứng dụng ra khỏi cơ sở hạ tầng của mình để có thể cung cấp phần mềm một cách nhanh chóng.
+Với Docker, bạn có thể quản lý cơ sở hạ tầng theo cùng cách quản lý ứng dụng của mình.
+Bằng cách tận dụng các phương pháp của Docker để vận chuyển, thử nghiệm và triển khai code một cách nhanh chóng, bạn có thể làm giảm đáng kể sự chậm trễ giữa việc viết code và chạy nó trong sản xuất
+#### 1.1.2 Kiến trúc Docker.
+Docker client trao đổi với Docker daemon thông qua REST API
+![Alt text](images/docker1.png)
+Docker daemon Docker daemon (dockerd) nghe các yêu cầu từ Docker API và quản lý các đối tượng Docker như =images, containers, network và volumn. Một daemon cũng có thể giao tiếp với các daemon khác để quản lý các Docker services.
+
+Docker registries Các Docker image có thể được đăng ký lưu trữ một cách dẽ dàng qua Docker Hub và Docker Cloud để bạn có thể đẩy lên vào kéo về dễ dàng các images.
+
+Docker objects Khi bạn sử dụng Docker là lúc mà bạn tạo ra các images, containers, networks, volume, plugins và các other objects.
+
+IMAGE: là các template read-only hướng dẫn cách tạo ra các Docker container. image được sử dụng để đóng gói ứng dụng và các thành phần phụ thuộc của ứng dụng. Image có thể được lưu trữ ở local hoặc trên một registry. Ví dụ ban có thể xây dựng 1 image trên ubuntu, cài Apache server , cũng như cấu hình chi tiết nhưng thứ cần thiết cho viêc running ứng dụng của bạn.
+
+CONTAINERS: 1 Container là 1 runable instance của image. Bạn có thể create, run, stop, delete or move container sử dụng Docker API or CLI. Bạn có thể kết nối 1 hoặc nhiều network, lưu trữ nó, hoặc thậm chí tạo ra 1 image mới dựa trên trạng thái của nó. Default thì một container được cách ly tương đối với các container và host machine. Bạn có thể control được việc cách ly network, storage, hoặc các sub system khác nằm dưới các containers hoặc các host machine.
+
+SERVICES: Service cho phép bạn mở rộng các contaners thông qua Docker daemons, chúng làm việc với nhau như 1 nhóm (swarm) với machine manager và workers. Mỗi một member của swarm là 1 daemon Docker giao tiếp với nhau bằng cách sử dụng Docker API. Theo mặc định thì service được cân bằng tải trên các nodes.
+
+NETWORK: Cung cấp một private network mà chỉ tồn tại giữa container và host.
+
+VOLUME: volume được thiết kể để lưu trữ các dữ liệu độc lập với vòng đời của container. Biểu đồ minh họa các lệnh phổ biến của Docker Client và mối quan hệ giữa các thành phần trên: 
+![Alt text](images/docker2.png)
+
 
 ### 1.2 Ansible
+Việc cài đặt và cấu hình các máy chủ thường được ghi chép lại trong tài liệu dưới dạng các câu lệnh đã chạy, với giải thích kèm theo. Cách thức này gây mệt mỏi cho quản trị viên vì phải làm theo từng bước ở mỗi máy khi thiết lập mới, và có thể dẫn đến sai lầm, thiếu sót. (trích: bachkhoa-aptech)
+
+Ansible giúp cấu hình "nhiều" server theo tùy biến rất đa dạng, giảm thiểu thời gian thao tác trên từng server được cài đặt
 
 ### 1.3 Terraform
+Terraform là một công cụ mã nguồn mở hoàn toàn miễn phí được phát hành vào tháng 7 năm 2014 bởi HashiCorp. Công cụ này giúp người dùng định nghĩa và lưu trữ thông tin tài nguyên bên trong hạ tầng hệ thống của mình thông qua các file code. Từ những file code này người dùng có thể sử dụng để triển khai hạ tầng của mình trên cloud như AWS, GCP, Azure, Digital Ocean, GitHub, Cloudflare,… hay cả VMware vSphere,…
+#### Đơn giản hóa việc khởi tạo và quản lý tài nguyên
+Mọi thông tin về tài nguyên của hệ thống sẽ được định nghĩa trong file, điều này giúp bạn đơn giản hóa việc triển khai với nhiều bước khác nhau bằng một câu lệnh đơn giản. Ví dụ như bạn cần khởi tạo 1 con EC2 trên AWS, bạn sẽ phải vào console của EC2 và thực hiện các bước “đơn giản” sau:
 
-### 1.4 Git
+Nhấn nút khởi tạo EC2
+Chọn “base image”
+Chọn loại EC2 bạn muốn sử dụng theo nhu cầu
+Cấu hình subnet/VPC
+Cấu hình Security Group
+Chọn “pemkey” cho EC2 để sau này có thể SSH vào
+Nhấn nút khởi tạo để AWS tiến hành tạo EC2 dựa trên các cấu hình ở bước trên
+Ít nhất cũng 7 bước để có thể tạo 1 con EC2 cho bạn sử dụng. Vậy nếu như bạn tạo nhiều hơn 1 con EC2 thì sẽ như thế nào? Sẽ bao gồm 7*<số con EC2 cần tạo> bước để có thể tạo xong số lượng EC2 chúng ta cần tạo.
+#### Đồng nhất quá trình triển khai và quản lý hạ tầng
+Trong trường bạn đang sử dụng từ 2-3 cloud, công việc triển khai cho mỗi cloud hầu như sẽ khác nhau. Nhưng nếu sử dụng Terraform, mọi sự khác nhau sẽ được định nghĩa trên file code, việc triển khai vẫn không thay đổi. Bạn chỉ cần khai báo “provider” & tên tài nguyên tương ứng với cloud. Terraform sẽ thay bạn khởi tạo các tài nguyên trên từng cloud chỉ định. Công việc trước đây tốn hàng giờ để làm thì nay chỉ tốn vài phút là đã hoàn tất cho toàn bộ các cloud được chỉ định.
+#### Cách thức hoạt động của Terraform
+Terraform có thể khởi tạo và quản lý các tài nguyên thông qua các API mà “provider” (cloud/service) hỗ trợ. Các provider sẽ “mở API” cho Terraform được phép truy cập để khởi tạo và quản lý các tài nguyên. Theo số liệu chính thức được đăng tải trên trang chủ của Terraform, đã có hơn 1700 “provider” hỗ trợ Terraform trong việc quản lý hàng ngàn tài nguyên và dịch vụ. Và con số này dự kiến sẽ còn tăng trong thời gian tới.
 
-### 1.5 Amazone Cloud- AWS
+![Alt text](images/terraform1.png)
 
-### 1.6 Docker Hub
+Luồng xử lý chính của Terraform sẽ cơ bản bao gồm 3 bước sau:
+
+- Write: đây là bước định nghĩa các tài nguyên bạn sẽ khởi tạo và quản lý vào 1 file code với định dạng file là “tf” (định dạng mặc định của Terraform).
+
+- Plan: Terraform sẽ dựa vào file bạn viết ở bên trên để tạo ra 1 plan (kế hoạch) thực thi chi tiết. Plan này sẽ xác định các tài nguyên nào sẽ được tạo mới theo thứ tự cần thiết, các tài nguyên nào sẽ được cập nhật hoặc bị xóa dựa vào tình trạng/trạng thái hiện tại của hạ tầng mà Terraform đã ghi nhận được
+
+- Apply: Terraform sẽ tiến hành thực thi plan với nhiều tiến trình song song. Điều này giúp tối ưu thời gian xử lý thay vì xử lý tuần tự.
+
+![Alt text](images/terraform2.png)
+Mặc định, Terraform sẽ thực thi cùng lúc 10 thao tác dựa vào plan đã được quy định. Tuy là thực thi song song nhưng sẽ vẫn thứ tự nhất định dựa vào plan đã đề ra. Ví dụ như khi bạn khởi tạo 1 EC2 và 1 Security group cho EC2 trên AWS, Terraform sẽ tiến hành tạo Security group trước khi tạo EC2.
+#### Ưu điểm
+- Mã nguồn mở và miễn phí
+- Dễ sử dụng
+- Tối ưu thời gian triển khai tài nguyên nhờ vào đa luồng
+- Hỗ trợ nhiều cloud
+- Dễ dàng tích hợp CI/CD
+#### Nhược điểm
+- Các tính năng collab và bảo mật chỉ có sẵn trong các gói doanh nghiệp đắt tiền
+- Không có cơ chế xử lý lỗi
+- Không tự động rollback nếu như những thay đổi tài nguyên không chính xác. Trong trường hợp gặp lỗi trong quá trình triển khai một tài nguyên bất kỳ, bạn sẽ cần xóa toàn bộ tài nguyên đã khởi tạo trước thành công trước đó
+
+
+
+### 1.4 Amazone Cloud- AWS
+
+### 1.5 Docker Hub
 Dùng để tạo registry lưu trữ đóng gói các container do chúng ta tạo nên. Đơn cử như nội dung báo cáo lần này.
 Sử dụng docker hub như một công cụ lưu trữ các snapshot version của application và database
   1. Bước 1 đăng ký tài khoản trên docker hub: https://hub.docker.com
