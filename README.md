@@ -250,9 +250,25 @@ Ta sử dụng descripe-instance để truy vấn có bao nhiêu instance đang 
 aws ec2 describe-instances
 ~~~
 ## Phần III. Tiến hành chạy thử
+### Triển khai EC2 trên AWS bằng terraform
+Bước này ta sẽ có các thông số  của instance như Ip public và key pair
+#### Khởi chạy main.tf
+- Bước 1: Chạy terraform init để terraform tiến hành biên dịch main.tf sang json
+~~~bash
+terraform init
+~~~
+- Bước 2: sử dụng câu lệnh Terraform plan 
+~~~bash
+terraform plan
+~~~
+- Bước 3: Sử dụng Terraform apply để tiến hành deploy EC2 trên AWS theo thông số định sẵn trong main.tf
+~~~bash
+terraform apply
+~~~
 
+#### Kiểm tra thông số EC2 được tạo trên AWS Console
 
-
+Chú ý phần Ip public và hostname để tiến hành cài đặt ansible
 
     
 
