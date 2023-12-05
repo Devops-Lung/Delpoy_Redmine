@@ -1,5 +1,11 @@
 # Triển Khai Redmine Server Trên AWS-EC2
-Sử dụng Terraform, Ansible, Docker Hub.
+Sử dụng Terraform tạo EC2 sau đó dùng Ansible cài đặt docker cho EC2.
+Sử dụng Ansible pull docker image redmine & redmine database đã đóng gói.
+Kiểm tra thử thông qua port 80 ip public hoặc domain do aws cung cấp xem server Redmine đã chạy thành công chưa.
+Tiến hành đóng gói backup container.
+Restore bằng cách pull image trên docker hub về để kiểm tra tính toàn vẹn dữ liệu.
+
+
 ## Authors
  - Lớp: 20TXTH02
  - Nhóm: 04
