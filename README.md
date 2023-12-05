@@ -89,6 +89,7 @@ Luồng xử lý chính của Terraform sẽ cơ bản bao gồm 3 bước sau:
 - Apply: Terraform sẽ tiến hành thực thi plan với nhiều tiến trình song song. Điều này giúp tối ưu thời gian xử lý thay vì xử lý tuần tự.
 
 ![Alt text](images/terraform2.png)
+
 Mặc định, Terraform sẽ thực thi cùng lúc 10 thao tác dựa vào plan đã được quy định. Tuy là thực thi song song nhưng sẽ vẫn thứ tự nhất định dựa vào plan đã đề ra. Ví dụ như khi bạn khởi tạo 1 EC2 và 1 Security group cho EC2 trên AWS, Terraform sẽ tiến hành tạo Security group trước khi tạo EC2.
 #### Ưu điểm
 - Mã nguồn mở và miễn phí
