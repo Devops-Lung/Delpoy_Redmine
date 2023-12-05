@@ -1,0 +1,77 @@
+
+version: '3.1'
+
+services:
+
+  redmine:
+    image: redmine    
+    restart: always
+    ports:
+      - 80:3000
+    environment:
+      REDMINE_DB_USER: root
+      REDMINE_DB_MYSQL: redminedb
+      REDMINE_DB_PASSWORD: 123abc456@
+      REDMINE_SECRET_KEY_BASE: lungdh11DT
+
+    volumes:  
+    #Mount /usr/src/redmine/files vao volume app
+      - type: volume
+        source: app
+        target: /usr/src/redmine/files        
+      
+
+    networks:
+      redmine_net:
+        ipv4_address: 10.33.68.4
+    #chay redminedb truoc    
+    depends_on:
+      - redminedb
+
+  redminedb:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 123abc456@
+      MYSQL_DATABASE: redmine
+    volumes: 
+    #Mount /var/lib/mysql vao volume db
+      - type: volume
+        source: db     
+        target: "/var/lib/mysql"
+         
+       
+    networks:
+      redmine_net:
+        ipv4_address: 10.33.68.2
+volumes:
+ # Volume app duoc bind sang ./app cua thu muc chay lenh ( khai chayj anssible chi dinh thu muc)
+  app:
+   #volume name
+   name: redmine_app
+   driver: local
+   driver_opts:
+     type : none
+     device: ./app
+     o: bind
+  # Tuong tu nhu app   
+  db: 
+   #Volume name
+   name: redmine_db
+   driver: local
+   driver_opts:
+     type: none
+     device: ./db
+     o: bind
+  
+
+networks:
+     redmine_net:
+        name: redmine_net
+        driver: bridge
+        ipam:
+          config:
+            - subnet: 10.33.68.0/24
+              gateway: 10.33.68.1
+
+      

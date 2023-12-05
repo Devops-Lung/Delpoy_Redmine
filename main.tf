@@ -81,14 +81,15 @@ resource "aws_security_group" "web_sg" {
 }
 
 #Tao Instance Linux Server su dung free tier cua AWS
-# Instance su dung Key de SHH duoc khai bao trong Keypem tren AWS Console
+#Instance su dung Key de SHH duoc khai bao trong Keypem tren AWS Console
 #Su dung key nay de SSH len Server
+#Yeu cau may co RAM toi thieu 4Gb nen su dung T2. Medium gia thue: 0.056 usd/Hr
 resource "aws_instance" "web_instance" {
-  ami           = "ami-082b1f4237bd816a1"
-  instance_type = "t2.micro"
+  ami           = "ami-078c1149d8ad719a7"
+  instance_type = "t2.medium"
   key_name      = "EC2-Public"
 
-  subnet_id                   = aws_subnet.Redmine_public_subnet.id
+  subnet_id                   = aws_subnet.redmine_public_subnet.id
   vpc_security_group_ids      = [aws_security_group.web_sg.id]
   associate_public_ip_address = true
 
