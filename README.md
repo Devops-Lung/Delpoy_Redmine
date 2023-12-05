@@ -1,15 +1,17 @@
 # Triển Khai Redmine Server Trên AWS-EC2
-Sử dụng Terraform và Ansible
+Sử dụng Terraform, Ansible, Docker Hub.
 ## Authors
  - Lớp: 20TXTH02
+ - Nhóm: 04
  - Giảng Viên: Huỳnh Lê Duy Phúc
  - Thành Viên :
     |STT| Họ Tên           |MSSV        |
     |:-:| :---------------:|:----------:|
     | 1.| Hồ Như Lừng      |- 2010060048|
-    | 2.| Huỳnh Quang Khải |- 20100600  |
-    | 3.| Phạm Văn Quang   |- 20100600  |
-    | 4.| Lê Cao Trí       |- 20100600  |
+    | 2.| Huỳnh Quang Khải |- 2010060044|
+    | 3.| Phạm Văn Quang   |- 2010060051|
+    | 4.| Lê Ngọc Trí      |- 2010060038|
+    | 5.| Phan Châu Pha    |-2010060061 |
 
 ## Tài Nguyên
 - Terraform
@@ -150,7 +152,7 @@ Ta sử dụng descripe-instance để truy vấn có bao nhiêu instance đang 
 ~~~bash
 aws ec2 describe-instances
 ~~~
-
+## Phần III. Tiến hành chạy thử
 
 
 
