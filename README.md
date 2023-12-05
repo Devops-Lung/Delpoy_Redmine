@@ -7,11 +7,11 @@ Sử dụng Terraform, Ansible, Docker Hub.
  - Thành Viên :
     |STT| Họ Tên           |MSSV        |
     |:-:| :---------------:|:----------:|
-    | 1.| Hồ Như Lừng      |- 2010060048|
-    | 2.| Huỳnh Quang Khải |- 2010060044|
-    | 3.| Phạm Văn Quang   |- 2010060051|
-    | 4.| Lê Ngọc Trí      |- 2010060038|
-    | 5.| Phan Châu Pha    |-2010060061 |
+    | 1.| Hồ Như Lừng      |  2010060048|
+    | 2.| Huỳnh Quang Khải |  2010060044|
+    | 3.| Phạm Văn Quang   |  2010060051|
+    | 4.| Lê Ngọc Trí      |  2010060038|
+    | 5.| Phan Châu Pha    |  2010060061|
 
 ## Tài Nguyên
 - Terraform
