@@ -269,6 +269,10 @@ terraform apply
 #### Kiểm tra thông số EC2 được tạo trên AWS Console
 
 Chú ý phần Ip public và hostname để tiến hành cài đặt ansible
+1. Mở Amazone EC2 Console
+2. Chọn Running Instance
+3. Click Connect
+4. 
 
     
 
