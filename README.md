@@ -373,24 +373,37 @@ Như vậy chúng ta đã có thể  deploy docker và dựng server Redmine tr�
 
     - name: Add your user to the docker group.
       ansible.builtin.shell:
-        cmd:  sudo usermod -aG docker ubuntu      
+        cmd:  sudo usermod -aG docker ubuntu 
+
+    - name: Get infor on container
+      ansible.builtin.shell:
+        cmd: docker container ls
+      register: result  
+
+    - name: Print information about container
+      debug:
+        var: result      
+    
     
     - name: Run Docker Compose
       become_user: ubuntu
       ansible.builtin.shell:
         cmd: docker compose up -d
         chdir: /home/ubuntu/redmine
-      
+      when:  result     
+            
 
 ~~~
 
 2. Giải thích:
 
 Bước 1: tiến hành cài đặt docker đến EC2 từ task: Install apitue đến task: Install Docker Module for Python
-Bước 2: Copy file docker-compose từ máy cá nhân sang EC2 thông qua task: Copy file
-Bước 3: Do file playbook được tái sử dụng nhiều lần nên để tránh việc báo lỗi nếu container đã start chúng ta nên tạo task 
+Bước 2: Tạo thư mục chứa dự án và data qua task: Create Folder Redmine app folder và Create Folder Redmine db folder
+Bước 3: Copy file docker-compose từ máy cá nhân sang EC2 thông qua task: Copy file
+Bước 4: Do file playbook được tái sử dụng nhiều lần nên để tránh việc báo lỗi nếu container đã start chúng ta nên tạo task check container tồn tại hay không
 kiểm tra xem container đã tồn tại trên docker-container hay chưa thông qua 2 task: Check If container Is Running và Debug Docker Output
-Bước 4: Chạy file docker-conpose.yml trên EC2 để dựng Server Redmine.
+Bước 5: Tạo add user vào group docker: Add your user to the docker group.
+Bước 6: Chạy file docker-conpose.yml trên EC2 để dựng Server Redmine qua task: Run Docker Compose
 
 
 3. Chạy Ansible playbook bằng câu lệnh sau:
@@ -400,9 +413,89 @@ ansible-playbook 1_install_docker.yml
 ~~~
 
 Kết quả sẽ như sau:
+![Alt text](images/ansible_playbook_1.png)
+![Alt text](images/ansible_playbook_2.png)
+
+4. Kiểm tra xem docker compose đã cấu hình đúng server Redmine qua câu lệnh:
+
+~~~bash
+curl http://ip_public_ec2
+~~~
+
+Hoặc có thể thông qua trình duyệt web để kiểm tra
+
+Kết quả:
+
+![Alt text](images/redmine_check_result.png)
+
+#### 3.3 Backup and Restore
+##### 3.3.1 Đóng gói Redmine lúc một ngày một lần và tự động xoá backup sau 30 ngày
+
+1. Chúng ta cần thêm file script redmine_backup.sh trên EC2 
+ - Script backup;
+ ~~~bash
+AGE_TO_COMPRESS=3600 # 1 day
+CIRCLE_DAY=108000 # 30 days
+# list of file to compress
+LOG_FILES="~/redmine/app ~/redmine/db"
+
+# Any file older than EDGE_DATE must be compressed
+NOW=$( date +%s )
+EDGE_DATE=$(( NOW - AGE_TO_COMPRESS ))
+
+for file in $LOG_FILES ; do
+    # check if file exists
+    if [ -e "$file" ] ; then 
+
+        # compare "modified date" of file to EDGE_DATE
+        if [ $( stat -c %Y "$file" ) -lt ${EDGE_DATE} ] ; then
+
+            # create tar file of a single file
+            # this is an odd way to compress a file
+            tar -cvzf $file.tar.gz $file
+           
+        fi
+        if [ $( stat -c %Y "$file" ) -lt ${CIRCLE_DAY} ] ; then
+
+            # create tar file of a single file
+            # this is an odd way to compress a file
+            rm $file
+           
+        fi
+
+    fi
+done
+
+~~~
+2. Run file redmine_bakup.sh
+~~~bash
+ ~/redmine_backup.sh
+~~~
 
 
+3. Sử dụng SCP để dowload các file bakup về máy 
 
+~~~bash
+scp -rC -i /folder/have/key_pair.pem ubuntu@ip_public: /home/redmine/*.tar.gz /folder/backup/
+~~~
+
+##### 3.3.2 Restore dữ liệu
+
+1. Copy file sang EC2 cần chạy lại Redmine
+~~~bash
+scp -rC -i /folder/have/key_pair.pem  /folder/backup/file.tar.gz ubuntu@ip_public: /home/ubuntu/redmine/
+~~~
+2. Giải nén 
+
+~~~bash
+ tar -xzvf filename.tar.gz
+~~~
+3. Run lại docker-compose
+~~~bash
+docker compose up -d
+~~~
+
+=====================================END========================================================
 
 
 
