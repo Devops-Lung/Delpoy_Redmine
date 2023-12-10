@@ -49,19 +49,17 @@ volumes:
   app:
    #volume name
    name: redmine_app
-   driver: local
    driver_opts:
      type : none
-     device: ./app
+     device: ~/redmine/app
      o: bind
   # Tuong tu nhu app   
   db: 
    #Volume name
-   name: redmine_db
-   driver: local
+   name: redmine_db  
    driver_opts:
      type: none
-     device: ./db
+     device: ~/redmine/db
      o: bind
   
 

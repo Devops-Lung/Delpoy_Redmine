@@ -250,9 +250,9 @@ Ta sử dụng descripe-instance để truy vấn có bao nhiêu instance đang 
 aws ec2 describe-instances
 ~~~
 ## Phần III. Tiến hành chạy thử
-### Triển khai EC2 trên AWS bằng terraform
+### 3.1 Triển khai EC2 trên AWS bằng terraform
 Bước này ta sẽ có các thông số  của instance như Ip public và key pair
-#### Khởi chạy main.tf
+#### 3.1.1 Khởi chạy main.tf
 - Bước 1: Chạy terraform init để terraform tiến hành biên dịch main.tf sang json
 ~~~bash
 terraform init
@@ -266,13 +266,146 @@ terraform plan
 terraform apply
 ~~~
 
-#### Kiểm tra thông số EC2 được tạo trên AWS Console
+#### 3.1.2 Kiểm tra thông số EC2 được tạo trên AWS Console
 
 Chú ý phần Ip public và hostname để tiến hành cài đặt ansible
 1. Mở Amazone EC2 Console
 2. Chọn Running Instance
+![Alt text](images/IP_Public_EC2_1.png)
+
 3. Click Connect
-4. 
+![Alt text](images/IP_Public_EC2_2.png)
+
+4. Chọn tab SSH Client
+![Alt text](images/IP_Public_EC2_3.png)
+
+Như Vậy ta đã có IP public của EC2 trên AWS.
+Bước tiếp theo add IP Public này vào Ansible Inventory.
+
+### 3.2 Cấu hình Ansible và cài đặt Docker trên EC2 
+#### 3.2.1 Cấu hình Ansible Inventory và ping đến EC2
+
+Ta tiến hành chỉnh sửa file Ansible Inventory tại /etc/ansible/hosts bằng nano hoặc vim hoặc có thể dùng cat.
+1. Chỉnh sửa nội dung như sau:
+~~~bash
+sudo nano /etc/ansible/hosts
+~~~
+2. Thêm hostname và thông tin như sau:
+~~~bash
+[redmine_ec2]
+[IP public EC2] ansible_ssh_user=ubuntu ansible_ssh_private_key_file=[location save key pair /EC2-Public.pem]
+~~~
+3. Sau khi thêm thông tin cần thiết trên Ansible Inventory chúng ta lưu cấu hình bằng phím tắt trên nano: Ctrl+O enter và Ctrl+X
+4. Ping đến EC2 bằng câu lệnh sau:
+~~~bash 
+ansible redmine_ec2 -m ping
+~~~
+
+Kết quả thành công sẽ như sau:
+
+![Alt text](images/Ansible_ping_EC2.png)
+
+Như vậy chúng ta đã có thể  deploy docker và dựng server Redmine trên EC2 thông qua Ansible
+
+#### 3.2.2 Tiến hành chạy Ansible playbook fie 1_install_docker.yml và diễn giải
+
+1. Nội dung file ansible playbook như sau:
+~~~bash
+- name: Install docker
+  hosts: redmine_ec2
+  become: true
+  become_user: root
+  tasks:
+    - name: Install aptitude
+      apt:
+        name: aptitude
+        state: latest
+        update_cache: true
+    - name: Install required system packages
+      apt:
+        pkg:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+          - python3-pip
+          - virtualenv
+          - python3-setuptools
+        state: latest
+        update_cache: true
+    - name: Add Docker GPG apt Key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+    - name: Add Docker Repository
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu focal stable
+        state: present
+    - name: Update apt and install docker-ce
+      apt:
+        name: docker-ce
+        state: latest
+        update_cache: true
+    - name: Install Docker Module for Python
+      pip:
+        name: docker
+    - name: Create Folder Redmine app folder
+      ansible.builtin.shell:
+        cmd: sudo mkdir -p /home/ubuntu/redmine/app
+    - name: Create Folder Redmine db folder
+      ansible.builtin.shell:
+        cmd: sudo mkdir -p /home/ubuntu/redmine/db
+
+    - name: Copy file
+      copy:
+        src: ./docker-compose.yml
+        dest: /home/ubuntu/redmine   
+
+    - name: Check If container Is Running
+      ansible.builtin.shell:
+        cmd: sudo docker ps      
+      register: docker_container_valid
+      ignore_errors: 'yes'
+
+    - name: Debug Docker Output
+      debug:
+        var: docker_container_valid
+
+    - name: Add your user to the docker group.
+      ansible.builtin.shell:
+        cmd:  sudo usermod -aG docker ubuntu      
+    
+    - name: Run Docker Compose
+      become_user: ubuntu
+      ansible.builtin.shell:
+        cmd: docker compose up -d
+        chdir: /home/ubuntu/redmine
+      
+
+~~~
+
+2. Giải thích:
+
+Bước 1: tiến hành cài đặt docker đến EC2 từ task: Install apitue đến task: Install Docker Module for Python
+Bước 2: Copy file docker-compose từ máy cá nhân sang EC2 thông qua task: Copy file
+Bước 3: Do file playbook được tái sử dụng nhiều lần nên để tránh việc báo lỗi nếu container đã start chúng ta nên tạo task 
+kiểm tra xem container đã tồn tại trên docker-container hay chưa thông qua 2 task: Check If container Is Running và Debug Docker Output
+Bước 4: Chạy file docker-conpose.yml trên EC2 để dựng Server Redmine.
+
+
+3. Chạy Ansible playbook bằng câu lệnh sau:
+
+~~~bash
+ansible-playbook 1_install_docker.yml
+~~~
+
+Kết quả sẽ như sau:
+
+
+
+
+
+
 
     
 

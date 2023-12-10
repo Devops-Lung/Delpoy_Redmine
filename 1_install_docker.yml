@@ -36,27 +36,47 @@
     - name: Install Docker Module for Python
       pip:
         name: docker
+    - name: Create Folder Redmine app folder
+      ansible.builtin.shell:
+        cmd: sudo mkdir -p /home/ubuntu/redmine/app
+    - name: Create Folder Redmine db folder
+      ansible.builtin.shell:
+        cmd: sudo mkdir -p /home/ubuntu/redmine/db
+
     - name: Copy file
       copy:
         src: ./docker-compose.yml
-        dest: ~/
+        dest: /home/ubuntu/redmine   
 
     - name: Check If container Is Running
       ansible.builtin.shell:
-        cmd: sudo docker ps
+        cmd: sudo docker ps      
       register: docker_container_valid
       ignore_errors: 'yes'
 
     - name: Debug Docker Output
       debug:
         var: docker_container_valid
-    - name: Log into DockerHub
-    
-      community.docker.docker_login:
-        username: lungho
-        password: lungdh11dt
-    - name: Run Docker Compose
+
+    - name: Add your user to the docker group.
       ansible.builtin.shell:
-        cmd: sudo docker compose up -d
-        chdir: ~/
-      when: docker_container_valid.failed
+        cmd:  sudo usermod -aG docker ubuntu 
+
+    - name: Get infor on container
+      ansible.builtin.shell:
+        cmd: docker container ls
+      register: result  
+
+    - name: Print information about container
+      debug:
+        var: result      
+    
+    
+    - name: Run Docker Compose
+      become_user: ubuntu
+      ansible.builtin.shell:
+        cmd: docker compose up -d
+        chdir: /home/ubuntu/redmine
+      when:  result
+      
+      
